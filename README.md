@@ -1,4 +1,20 @@
-# GRC DevSecOps PFS
+<h1 align="center">GovernSecOps</h1>
+
+<p align="center">
+  <strong>Unified DevSecOps &amp; GRC Engineering Platform</strong>
+</p>
+
+<p align="center">
+  Governance &bull; Risk Management &bull; Continuous Compliance &bull; Security Automation
+</p>
+
+<p align="center">
+  <a href="#vision">Vision</a> &middot;
+  <a href="#proposed-solution-architecture">Architecture</a> &middot;
+  <a href="#devsecops-and-grc-model">DevSecOps &amp; GRC</a> &middot;
+  <a href="#getting-started">Getting Started</a> &middot;
+  <a href="#contribution-guidance">Contributing</a>
+</p>
 
 A collaborative, academic DevSecOps project focused on building a sample application while integrating Governance, Risk, and Compliance (GRC) practices throughout the software lifecycle.
 
