@@ -4,10 +4,7 @@ Projet de fin de semestre — ENSA Marrakech.
 
 ## Présentation
 
-Ce projet consiste à développer une application de gestion de tâches
-et à automatiser son cycle de livraison sur Kubernetes, en intégrant
-des contrôles de sécurité et une démarche de Gouvernance,
-Gestion des Risques et Conformité (GRC).
+Ce projet consiste à développer une application de gestion de tâches et à automatiser son cycle de livraison sur Kubernetes, en intégrant des contrôles de sécurité et une démarche de Gouvernance, Gestion des Risques et Conformité (GRC).
 
 ## Fonctionnalités de l’application
 
@@ -22,14 +19,14 @@ Gestion des Risques et Conformité (GRC).
 
 L’application repose sur trois couches :
 
-- Frontend : Next.js.
-- Backend : deux microservices Python/FastAPI :
-  - Auth Service : comptes et authentification JWT.
-  - Task Service : gestion des tâches.
-- Base de données : une instance MongoDB avec deux bases logiques,
-  auth_db et tasks_db, et un compte dédié par service.
+- **Frontend :** Next.js.
+- **Backend :** deux microservices Python/FastAPI :
+  - **Auth Service :** comptes et authentification JWT.
+  - **Task Service :** gestion des tâches.
+- **Base de données :** une instance MongoDB avec deux bases logiques, `auth_db` et `tasks_db`, et un compte dédié par service.
 
-Les appels aux API passent par un Ingress HTTPS.
+Les appels aux API passent par un Ingress HTTPS. Task Service vérifie le JWT et limite l’accès aux tâches de l’utilisateur connecté.
+
 Les données MongoDB sont conservées sur un volume persistant EBS.
 
 ## Technologies prévues
@@ -37,6 +34,9 @@ Les données MongoDB sont conservées sur un volume persistant EBS.
 | Domaine | Technologies |
 |---|---|
 | Gestion du code | GitHub et pull requests |
+| Frontend | Next.js |
+| Backend | Python, FastAPI et PyMongo |
+| Base de données | MongoDB et volume EBS |
 | Infrastructure | Terraform, AWS EKS, IAM et VPC |
 | Intégration continue | GitHub Actions |
 | Conteneurs et registre | Docker et AWS ECR |
@@ -48,9 +48,7 @@ Les données MongoDB sont conservées sur un volume persistant EBS.
 
 ## Démarche GRC
 
-La démarche s’appuie sur NIST CSF 2.0, une sélection de contrôles
-du CIS Benchmark EKS et les principes de responsabilité
-d’ISO/IEC 27001:2022.
+La démarche s’appuie sur NIST CSF 2.0, une sélection de contrôles du CIS Benchmark EKS et les principes de responsabilité d’ISO/IEC 27001:2022.
 
 Les livrables prévus comprennent :
 
@@ -60,8 +58,7 @@ Les livrables prévus comprennent :
 - Une comparaison avant et après sécurisation.
 - Une analyse des risques résiduels.
 
-Le projet ne vise pas une certification ISO 27001
-ni une conformité réglementaire exhaustive.
+Le projet ne vise pas une certification ISO 27001 ni une conformité réglementaire exhaustive.
 
 ## Résultats attendus
 
@@ -74,9 +71,10 @@ ni une conformité réglementaire exhaustive.
 
 ## Cahier des charges
 
-Consulter le [cahier des charges](docs/Cahier_des_charges.pdf).
+Consulter le [cahier des charges](<Cahier de charge.pdf>).
 
 ## État du projet
 
 Phase de préparation et de mise en place.
-Les éléments présentés décrivent la cible du projet.
+
+Les éléments présentés décrivent la cible du projet et ne constituent pas une confirmation de leur réalisation.
