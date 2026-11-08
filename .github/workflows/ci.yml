@@ -28,6 +28,7 @@ jobs:
         run: |
           test -s README.md
           test -f .github/workflows/ci.yml
+          test -f docs/ci.md
           test -s docs/ci.md
           echo "Structure du projet validee."
 
