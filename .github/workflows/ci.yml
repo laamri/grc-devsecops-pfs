@@ -1,0 +1,53 @@
+
+name: US09 - CI initiale
+
+# Evenements qui declenchent le pipeline
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+# Permissions minimales du token GitHub
+permissions:
+  contents: read
+
+jobs:
+  initial-checks:
+    name: Verifications minimales
+    runs-on: ubuntu-latest
+
+    steps:
+      # Etape 1 : recuperer le depot
+      - name: Recuperer le code
+        uses: actions/checkout@v4
+
+      # Etape 2 : verifier les fichiers du projet
+      - name: Verifier la structure
+        shell: bash
+        run: |
+          test -s README.md
+          test -f .github/workflows/ci.yml
+          test -f docs/ci.md
+          test -s docs/ci.md
+          echo "Structure du projet validee."
+
+      # Etape 3 : demonstration avec un secret fictif
+      # Ne jamais afficher un vrai secret de production
+      - name: Verifier le masquage du secret fictif
+        if: github.event_name == 'push'
+        shell: bash
+        env:
+          US09_DEMO_SECRET: ${{ secrets.US09_DEMO_SECRET }}
+        run: |
+          if [ -z "$US09_DEMO_SECRET" ]; then
+            echo "::error::Secret US09_DEMO_SECRET absent."
+            exit 1
+          fi
+
+          echo "Test du secret fictif : $US09_DEMO_SECRET"
+          echo "La valeur doit apparaitre comme *** dans les logs."
+
+      # Etape 4 : confirmer la fin du pipeline
+      - name: Terminer la CI
+        run: echo "Pipeline US09 execute avec succes."
