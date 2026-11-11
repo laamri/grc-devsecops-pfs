@@ -1,26 +1,24 @@
-@'
-# Dossiers de travail Terraform
+# Fichiers de travail Terraform
 **/.terraform/*
 
-# Etats Terraform : ne jamais publier
+# Etats Terraform
 *.tfstate
 *.tfstate.*
 
-# Variables pouvant contenir des secrets
+# Variables sensibles
 *.tfvars
 *.tfvars.json
 !*.tfvars.example
 
-# Plans Terraform et journaux de crash
+# Plans et journaux Terraform
 *.tfplan
 crash.log
 crash.*.log
 
-# Identifiants et secrets locaux
+# Secrets locaux
 .env
 .env.*
 !.env.example
 .aws/
 *.pem
 *.key
-'@ | Set-Content -Encoding utf8 .gitignore
