@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pymongo
+pydantic
+pytest
+flake8fastapi
+uvicorn
+pymongo
+pydantic
+pytest
+flake8
