@@ -3,7 +3,7 @@ from main import app
 
 client = TestClient(app)
 
-def test_auth_health():
-response = client.get("/health")
-assert response.status_code == 200
-assert response.json() == {"status": "ok", "service": "auth_service"}
+def test_health_check():
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok", "service": "auth_service"}
