@@ -32,3 +32,17 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.swp
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+*.tfplan
+crash.log
+crash.*.log
+.aws/
+*.pem
+*.key
