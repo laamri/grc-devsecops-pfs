@@ -1,10 +1,5 @@
 fastapi
-uvicorn
-pymongo
-pydantic
-pytest
-flake8fastapi
-uvicorn
+uvicorn[standard]
 pymongo
 pydantic
 pytest
