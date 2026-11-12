@@ -266,3 +266,36 @@ npm run dev
 ```
 
 Cette procédure permet à n’importe quel collègue d’installer le même environnement de développement et de reproduire le fonctionnement local du projet sans ambiguïté.
+
+
+
+## 🚀 Reprise du Projet (Démarrage Rapide)
+
+Puisque l'environnement local est déjà configuré, utilisez ces commandes dans des terminaux séparés pour relancer l'application :
+
+### 1. Démarrer la Base de Données (MongoDB)
+Le conteneur Docker étant déjà créé, il suffit de le relancer depuis n'importe quel terminal :
+
+    docker start pfs-mongodb
+
+### 2. Lancer le Auth Service (Port 8001)
+Ouvrez un nouveau terminal PowerShell :
+
+    cd auth_service
+    .\venv\Scripts\Activate.ps1
+    uvicorn main:app --port 8001 --reload
+
+### 3. Lancer le Task Service (Port 8002)
+Ouvrez un nouveau terminal PowerShell :
+
+    cd task_service
+    .\venv\Scripts\Activate.ps1
+    uvicorn main:app --port 8002 --reload
+
+### 4. Lancer le Frontend Next.js (Port 3000)
+Ouvrez un nouveau terminal PowerShell :
+
+    cd frontend
+    npm run dev
+
+*L'interface sera ensuite accessible sur http://localhost:3000.*
