@@ -146,3 +146,29 @@ sans constituer une garantie absolue.
 
 Le backend distant et les tests décrits ci-dessus sont opérationnels.
 US02 reste en cours tant que les points restants ne sont pas validés.
+
+
+---
+
+# US03 — Provisionnement du Réseau (VPC) et des Accès IAM (Moindre Privilège)
+
+## 1. Architecture et Livrables
+
+Cette étape met en place l'infrastructure réseau cloisonnée et les rôles IAM dédiés dans la région `eu-north-1` :
+
+- **Documentation & Matrices :**
+  - `docs/network-flow-matrix.md` : Matrice des flux autorisés (ports `80`/`443` sur l'ALB public, ports `8001` et `8002` cloisonnés en sous-réseau privé).
+  - `docs/iam-permissions-matrix.md` : Définition du moindre privilège pour les trois identités du projet.
+- **Modules Terraform (`infra/terraform/modules/`) :**
+  - `modules/network/` : VPC (`10.0.0.0/16`), 2 sous-réseaux publics (`10.0.1.0/24`, `10.0.2.0/24`), 2 sous-réseaux privés (`10.0.10.0/24`, `10.0.11.0/24`), Internet Gateway, NAT Gateway, tables de routage et Security Groups (`sg-alb`, `sg-cluster`).
+  - `modules/iam/` : Création des rôles `grc-devsecops-pfs-terraform-role`, `grc-devsecops-pfs-cluster-role` (avec Instance Profile), et `grc-devsecops-pfs-ci-role`.
+
+## 2. Mise à jour locale après un `git pull` (Oussama, Sayf, L7sen)
+
+Après avoir récupéré les modifications depuis la branche `develop`, **il est obligatoire de ré-exécuter `terraform init`** (sans `-reconfigure`) afin d'enregistrer les nouveaux modules locaux `network` et `iam` :
+
+```powershell
+$env:AWS_PROFILE = "pfs-dev"
+terraform -chdir=infra/terraform init
+terraform -chdir=infra/terraform validate
+terraform -chdir=infra/terraform plan -lock-timeout=30s
