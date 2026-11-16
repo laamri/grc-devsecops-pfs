@@ -7,6 +7,47 @@ on:
     branches: [ "main", "develop" ]
 
 jobs:
+  security-scan:
+    name: Secrets and dependency scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Detect secrets with Gitleaks
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Scan dependencies and filesystem with Trivy
+      uses: aquasecurity/trivy-action@0.28.0
+      with:
+        scan-type: fs
+        scan-ref: .
+        scanners: vuln
+        vuln-type: os,library
+        severity: HIGH,CRITICAL
+        ignore-unfixed: true
+        format: sarif
+        output: trivy-results.sarif
+        exit-code: '1'
+
+    - name: Upload security scan reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-scan-reports
+        path: |
+          gitleaks-report.json
+          gitleaks.sarif
+          trivy-results.sarif
+        if-no-files-found: ignore
+
   # 1. CI for Python FastAPI Microservices
   backend-ci:
     runs-on: ubuntu-latest
