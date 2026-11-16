@@ -39,10 +39,12 @@ jobs:
 
     - name: Lint and Test (FastAPI)
       run: |
+        set -o pipefail
         if [ -d "${{ matrix.service }}" ]; then
           cd ${{ matrix.service }}
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           pytest -q --junitxml="${{ github.workspace }}/${{ matrix.service }}-pytest.xml" | tee "${{ github.workspace }}/${{ matrix.service }}-pytest.log"
+        fi
 
     - name: Upload backend test report
       if: always()
@@ -53,8 +55,6 @@ jobs:
           ${{ matrix.service }}-pytest.xml
           ${{ matrix.service }}-pytest.log
         if-no-files-found: error
-        fi
-
     - name: Verify Docker Build (Backend)
       run: |
         if [ -f "${{ matrix.service }}/Dockerfile" ]; then
@@ -82,6 +82,7 @@ jobs:
 
     - name: Lint and build frontend
       run: |
+        set -o pipefail
         cd frontend
         npm run lint 2>&1 | tee "${{ github.workspace }}/frontend-lint.log"
         npm run build 2>&1 | tee "${{ github.workspace }}/frontend-build.log"
