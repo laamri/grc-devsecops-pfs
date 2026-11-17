@@ -6,7 +6,7 @@
 Mettre en place une integration continue automatisee
 avec GitHub Actions pour le projet GovernSecOps.
 
-Reference Jira : SCRUM-15 (US09).
+References Jira : SCRUM-15 (US09), SCRUM-18 (US10) et SCRUM-27 (US14).
 
 ## 2. Moteur CI
 
@@ -26,15 +26,18 @@ Un declenchement manuel est aussi configure via
 workflow_dispatch, une fois le workflow present
 sur la branche par defaut.
 
-## 4. Etapes du pipeline
+## 4. Étapes du pipeline
 
-1. Recuperation du code source.
-2. Verification de la structure du depot.
-3. Test de masquage d'un secret fictif sur push.
-4. Confirmation de la fin du pipeline.
+1. Récupération du code source.
+2. Installation des dépendances Python et Node.js.
+3. Lint ciblé et tests pytest pour Auth Service et Task Service.
+4. Lint et build Next.js.
+5. Publication des rapports JUnit et des journaux de validation comme artefacts.
+6. Scans de secrets et de dépendances avec seuils bloquants.
 
-Les tests applicatifs seront integres lorsque
-les composants du projet seront disponibles.
+Chaque push et chaque pull request vers `main` ou `develop` exécute ces contrôles. Un échec arrête le job concerné et le statut apparaît sur le commit.
+
+Les services backend produisent un rapport JUnit par service. Le frontend ne contient pas encore de suite de tests dédiée, donc le pipeline exécute le lint ESLint et le build Next.js comme validations applicatives et publie leurs journaux. Une suite de tests frontend pourra être ajoutée sans modifier le contrat des artefacts.
 
 ## 5. Gestion des secrets
 

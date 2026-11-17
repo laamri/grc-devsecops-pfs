@@ -2,9 +2,9 @@ name: DevSecOps PFS - CI Pipeline
 
 on:
   push:
-    branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
+  workflow_dispatch:
 
 jobs:
   # 1. CI for Python FastAPI Microservices
@@ -39,14 +39,22 @@ jobs:
 
     - name: Lint and Test (FastAPI)
       run: |
+        set -o pipefail
         if [ -d "${{ matrix.service }}" ]; then
           cd ${{ matrix.service }}
-          # Check for syntax errors
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # Run tests if a tests folder exists
-          if [ -d "tests" ]; then pytest; fi
+          pytest -q --junitxml="${{ github.workspace }}/${{ matrix.service }}-pytest.xml" | tee "${{ github.workspace }}/${{ matrix.service }}-pytest.log"
         fi
 
+    - name: Upload backend test report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.service }}-test-report
+        path: |
+          ${{ matrix.service }}-pytest.xml
+          ${{ matrix.service }}-pytest.log
+        if-no-files-found: error
     - name: Verify Docker Build (Backend)
       run: |
         if [ -f "${{ matrix.service }}/Dockerfile" ]; then
@@ -68,15 +76,26 @@ jobs:
         cache: 'npm'
         cache-dependency-path: 'frontend/package-lock.json' # Adjust path if needed
 
-    - name: Install & Build (Next.js)
+    - name: Install frontend dependencies
+      working-directory: frontend
+      run: npm ci
+
+    - name: Lint and build frontend
       run: |
-        if [ -d "frontend" ]; then
-          cd frontend
-          npm ci
-          npm run build
-        else
-          echo "Frontend directory not found yet. Skipping."
-        fi
+        set -o pipefail
+        cd frontend
+        npm run lint 2>&1 | tee "${{ github.workspace }}/frontend-lint.log"
+        npm run build 2>&1 | tee "${{ github.workspace }}/frontend-build.log"
+
+    - name: Upload frontend validation report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-test-report
+        path: |
+          frontend-lint.log
+          frontend-build.log
+        if-no-files-found: error
 
     - name: Verify Docker Build (Frontend)
       run: |
