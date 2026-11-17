@@ -39,9 +39,15 @@ export default function Home() {
       .then((d) => setTaskHealth(d.status || 'ok'))
       .catch(() => setTaskHealth('Hors ligne'));
 
-    // The task list is synchronized with the backend when the page mounts.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchTasks();
+    fetch(`${TASK_API}/tasks/`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data: Task[]) => setTasks(data))
+      .catch((err) => console.error('Erreur de chargement des tâches:', err));
   }, []);
 
   const addTask = async (e: React.FormEvent) => {
