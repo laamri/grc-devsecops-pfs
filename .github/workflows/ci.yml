@@ -43,8 +43,8 @@ jobs:
           cd ${{ matrix.service }}
           # Check for syntax errors
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # Run tests if a tests folder exists
-          if [ -d "tests" ]; then pytest; fi
+          # Run existing backend tests
+          python -m pytest -v
         fi
 
     - name: Verify Docker Build (Backend)
