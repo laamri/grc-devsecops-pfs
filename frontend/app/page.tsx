@@ -39,6 +39,8 @@ export default function Home() {
       .then((d) => setTaskHealth(d.status || 'ok'))
       .catch(() => setTaskHealth('Hors ligne'));
 
+    // The task list is synchronized with the backend when the page mounts.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchTasks();
   }, []);
 

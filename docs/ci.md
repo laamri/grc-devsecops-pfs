@@ -26,12 +26,14 @@ Un declenchement manuel est aussi configure via
 workflow_dispatch, une fois le workflow present
 sur la branche par defaut.
 
-## 4. Etapes du pipeline
+## 4. Étapes du pipeline
 
-1. Recuperation du code source.
-2. Verification de la structure du depot.
-3. Test de masquage d'un secret fictif sur push.
-4. Confirmation de la fin du pipeline.
+1. Récupération du code source.
+2. Installation des dépendances Python et Node.js.
+3. Lint ciblé et tests pytest pour Auth Service et Task Service.
+4. Lint et build Next.js.
+5. Publication des rapports JUnit et des journaux de validation comme artefacts.
+6. Scans de secrets et de dépendances avec seuils bloquants.
 
 Chaque push et chaque pull request vers `main` ou `develop` exécute ces contrôles. Un échec arrête le job concerné et le statut apparaît sur le commit.
 
@@ -42,6 +44,7 @@ Les services backend produisent un rapport JUnit par service. Le frontend ne con
 Le job `security-scan` récupère l’historique Git complet puis exécute Gitleaks sur le dépôt. Il exécute également Trivy en mode filesystem avec les dépendances directes et transitives des fichiers `requirements.txt` et `package-lock.json`. Une vulnérabilité HIGH ou CRITICAL connue et corrigée bloque le job. Les rapports disponibles sont publiés dans l’artefact `security-scan-reports` même lorsque le job échoue.
 
 Le scénario de validation d’un secret factice se fait dans une branche ou une copie de test temporaire. Ajouter une valeur synthétique reconnue par Gitleaks, pousser la branche, vérifier l’échec du job et supprimer la valeur sans la fusionner. La valeur ne doit jamais être un identifiant réel. Une dérogation pour faux positif doit être limitée à une ligne nécessaire, justifiée, approuvée et réévaluée avec une date d’expiration. Une dérogation ne doit pas supprimer le scan global ni abaisser le seuil HIGH/CRITICAL.
+
 
 ## 5. Gestion des secrets
 
