@@ -96,13 +96,6 @@ jobs:
           ${{ matrix.service }}-pytest.xml
           ${{ matrix.service }}-pytest.log
         if-no-files-found: error
-    - name: Verify Docker Build (Backend)
-      run: |
-        if [ -f "${{ matrix.service }}/Dockerfile" ]; then
-          cd ${{ matrix.service }}
-          docker build -t pfs-${{ matrix.service }}:test .
-        fi
-
   # 2. CI for Next.js Frontend
   frontend-ci:
     runs-on: ubuntu-latest
@@ -140,7 +133,15 @@ jobs:
 
     - name: Verify Docker Build (Frontend)
       run: |
-        if [ -f "frontend/Dockerfile" ]; then
-          cd frontend
-          docker build -t pfs-frontend:test .
-        fi
+        test -f frontend/Dockerfile
+        docker build -t pfs-frontend:test frontend
+
+  backend-image:
+    runs-on: ubuntu-latest
+    needs: backend-ci
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build shared backend image
+        run: |
+          test -f backend/Dockerfile
+          docker build -f backend/Dockerfile -t pfs-backend:test .
