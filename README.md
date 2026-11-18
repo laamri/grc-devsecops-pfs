@@ -171,6 +171,7 @@ This README should be updated as the project matures and implementation details 
 
 US06 construit exactement deux images applicatives : `pfs-frontend` et
 `pfs-backend`. MongoDB est une image tierce ; Docker Compose relève de US07.
+Pour lancer l'application complète, suivre le [guide Docker Compose US07](docs/compose.md).
 Les Dockerfiles utilisent des bases minimales fixées par digest, des étapes
 séparées et des utilisateurs non root. Le backend installe uniquement les
 packages de production de `backend/requirements.lock` (versions et SHA-256).
