@@ -1,0 +1,8 @@
+**
+!backend/
+!backend/Dockerfile
+!backend/requirements.lock
+!auth_service/
+!auth_service/main.py
+!task_service/
+!task_service/main.py

@@ -1,0 +1,81 @@
+# US07: three tiers, four services. Only the Next.js frontend is published.
+services:
+  frontend:
+    image: pfs-frontend:${COMPOSE_IMAGE_TAG:-us07}
+    pull_policy: build
+    build:
+      context: ./frontend
+      args:
+        # Public paths are bundled at build time; browsers never resolve Docker DNS.
+        NEXT_PUBLIC_AUTH_API_URL: /api/auth
+        NEXT_PUBLIC_TASK_API_URL: /api/task
+    environment:
+      # Server-only configuration, read when a proxy request is handled.
+      AUTH_INTERNAL_URL: http://auth:8001
+      TASK_INTERNAL_URL: http://task:8002
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:3000"
+    networks: [application]
+    depends_on:
+      auth:
+        condition: service_healthy
+      task:
+        condition: service_healthy
+    restart: unless-stopped
+    # Non-root user and HTTP healthcheck are inherited from the US06 image.
+
+  auth:
+    image: pfs-backend:${COMPOSE_IMAGE_TAG:-us07}
+    pull_policy: build
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: [uvicorn, auth_service.main:app, --host, 0.0.0.0, --port, "8001"]
+    environment:
+      PORT: "8001"
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+    networks: [application]
+    restart: unless-stopped
+    # Auth is currently a stub: it needs neither MongoDB nor Task to start.
+
+  task:
+    # Reuse the image built by Auth. No second backend build or registry pull.
+    image: pfs-backend:${COMPOSE_IMAGE_TAG:-us07}
+    pull_policy: never
+    command: [uvicorn, task_service.main:app, --host, 0.0.0.0, --port, "8002"]
+    environment:
+      PORT: "8002"
+      MONGO_URI: ${COMPOSE_MONGO_URI:-mongodb://mongo:27017/}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+    networks: [application, data]
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mongo:
+    # MongoDB 8.0, pinned to the exact upstream image tested by this project.
+    image: mongo:8.0.38@sha256:d97fea17ccb8d004cd137be8dab54d70d0df11be69c9f422aefe4484c8414ab7
+    volumes:
+      - mongo-data:/data/db
+    # Standalone MongoDB does not use the config-server directory persistently.
+    # Mask its image VOLUME to avoid an orphan anonymous volume after `down`.
+    tmpfs:
+      - /data/configdb
+    networks: [data]
+    healthcheck:
+      test: [CMD, mongosh, --quiet, --eval, "quit(db.adminCommand({ping:1}).ok ? 0 : 1)"]
+      interval: 5s
+      timeout: 3s
+      start_period: 10s
+      retries: 20
+    restart: unless-stopped
+
+networks:
+  application:
+  data:
+    internal: true
+
+volumes:
+  # Scoped by Compose project. `down` preserves it; `down -v` deletes its data.
+  mongo-data:
