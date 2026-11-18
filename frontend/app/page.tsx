@@ -7,14 +7,14 @@ interface Task {
   status: string;
 }
 
+const AUTH_API = process.env.NEXT_PUBLIC_AUTH_API_URL || 'http://localhost:8001';
+const TASK_API = process.env.NEXT_PUBLIC_TASK_API_URL || 'http://localhost:8002';
+
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTitle, setNewTitle] = useState('');
   const [authHealth, setAuthHealth] = useState('Vérification...');
   const [taskHealth, setTaskHealth] = useState('Vérification...');
-
-  const AUTH_API = 'http://localhost:8001';
-  const TASK_API = 'http://localhost:8002';
 
   const fetchTasks = async () => {
     try {

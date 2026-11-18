@@ -54,8 +54,8 @@ The following architecture is a starting point and may evolve as the project mat
 | Layer | Initial choice / target |
 | --- | --- |
 | Demo API | FastAPI |
-| Frontend | React |
-| Database | PostgreSQL |
+| Frontend | Next.js / React |
+| Database | MongoDB (implementation actuelle) |
 | CI/CD | GitHub Actions |
 | Packaging | Docker |
 | Infrastructure / orchestration | Terraform + Kubernetes |
@@ -165,3 +165,112 @@ The project will evolve from a scaffold into a fuller working implementation wit
 - policy-driven release gates
 
 This README should be updated as the project matures and implementation details become concrete.
+
+
+## Images
+
+US06 construit exactement deux images applicatives : `pfs-frontend` et
+`pfs-backend`. MongoDB est une image tierce ; Docker Compose relève de US07.
+Les Dockerfiles utilisent des bases minimales fixées par digest, des étapes
+séparées et des utilisateurs non root. Le backend installe uniquement les
+packages de production de `backend/requirements.lock` (versions et SHA-256).
+Le frontend utilise `npm ci`, `package-lock.json` et la sortie Next.js standalone.
+Les contextes utilisent des listes de fichiers autorisés dans leurs `.dockerignore`.
+Les environnements locaux, caches et outils de test ne sont pas copiés.
+
+### Construire (PowerShell, depuis la racine du dépôt)
+
+```powershell
+docker build -f backend/Dockerfile -t pfs-backend:us06 .
+docker build --build-arg NEXT_PUBLIC_AUTH_API_URL=http://localhost:8001 --build-arg NEXT_PUBLIC_TASK_API_URL=http://localhost:8002 -t pfs-frontend:us06 frontend
+if ($LASTEXITCODE -ne 0) { throw 'Echec du build' }
+```
+
+### Configuration
+
+| Variable | Lecture | Valeur locale par défaut / usage |
+| --- | --- | --- |
+| `NEXT_PUBLIC_AUTH_API_URL` | Build Next.js | `http://localhost:8001` |
+| `NEXT_PUBLIC_TASK_API_URL` | Build Next.js | `http://localhost:8002` |
+| `MONGO_URI` | Démarrage Task | `mongodb://localhost:27017/` ; utiliser le nom réseau Mongo en conteneur |
+| `CORS_ORIGINS` | Démarrage de chaque API | `http://localhost:3000` ; origines séparées par virgules |
+| `PORT` | Sonde backend / serveur frontend | Backend : `8001`, mettre `8002` pour Task ; frontend : `3000` |
+
+Les URL `NEXT_PUBLIC_*` sont publiques et intégrées au JavaScript envoyé au
+**navigateur**. Elles doivent être accessibles depuis le poste du navigateur,
+pas seulement depuis le réseau Docker. Les changer avec `docker run -e` ne
+modifie pas le bundle : reconstruire le frontend. Ne jamais y mettre de secret.
+Pour le développement local, les valeurs par défaut préservent les commandes
+existantes. Next.js lit `frontend/.env.local` ; Python lit les variables du
+processus, pas automatiquement les fichiers `.env`.
+
+### Lancer et vérifier (PowerShell)
+
+Exemple pour un poste local disposant des ports 3000, 8001 et 8002.
+Utiliser des noms libres ; ne pas remplacer un conteneur existant.
+
+```powershell
+docker network create pfs-us06-demo
+docker run -d --name pfs-us06-demo-mongo --network pfs-us06-demo mongo:8.0
+docker run -d --name pfs-us06-demo-auth --network pfs-us06-demo -p 127.0.0.1:8001:8001 -e CORS_ORIGINS=http://localhost:3000 pfs-backend:us06 uvicorn auth_service.main:app --host 0.0.0.0 --port 8001
+docker run -d --name pfs-us06-demo-task --network pfs-us06-demo -p 127.0.0.1:8002:8002 -e PORT=8002 -e MONGO_URI=mongodb://pfs-us06-demo-mongo:27017/ -e CORS_ORIGINS=http://localhost:3000 pfs-backend:us06 uvicorn task_service.main:app --host 0.0.0.0 --port 8002
+docker run -d --name pfs-us06-demo-front --network pfs-us06-demo -p 127.0.0.1:3000:3000 pfs-frontend:us06
+
+(Invoke-WebRequest http://localhost:3000/ -UseBasicParsing).StatusCode
+Invoke-RestMethod http://localhost:8001/health # service = auth_service
+Invoke-RestMethod http://localhost:8002/health # service = task_service
+Invoke-RestMethod -Method Post -Uri http://localhost:8002/tasks/ -ContentType application/json -Body '{"title":"US06 demo","status":"todo"}'
+Invoke-RestMethod http://localhost:8002/tasks/
+docker inspect --format '{{.Image}}' pfs-us06-demo-auth pfs-us06-demo-task
+docker image inspect --format '{{.Config.User}} {{.Size}}' pfs-backend:us06 pfs-frontend:us06
+docker exec pfs-us06-demo-auth id -u
+docker exec pfs-us06-demo-task id -u
+docker exec pfs-us06-demo-front id -u
+docker inspect --format '{{.State.Health.Status}}' pfs-us06-demo-auth pfs-us06-demo-task pfs-us06-demo-front
+docker history --no-trunc pfs-backend:us06
+docker history --no-trunc pfs-frontend:us06
+```
+
+La même image backend contient `auth_service.main` et `task_service.main` ; la
+commande explicite sélectionne l'application et le port. Aucun superviseur ne
+lance deux API dans le même conteneur. Les `/health` sont des sondes de vie et
+ne garantissent pas la disponibilité MongoDB ; le test création/lecture couvre
+cette dépendance. Auth reste une simulation sans authentification réelle.
+
+Nettoyer uniquement les ressources de cet exemple, si vous les avez créées :
+
+```powershell
+docker rm -fv pfs-us06-demo-front pfs-us06-demo-task pfs-us06-demo-auth pfs-us06-demo-mongo
+docker network rm pfs-us06-demo
+```
+
+### Validation depuis les seuls fichiers destinés à Git
+
+```powershell
+# Après revue et indexation des fichiers US06 :
+python scripts/validate_images.py
+if ($LASTEXITCODE -ne 0) { throw 'Validation US06 en echec' }
+```
+
+Le script exporte l'index Git dans un dossier temporaire vierge, construit les
+deux images, exécute pytest/flake8 dans des conteneurs jetables, puis teste les
+services avec des ports hôte attribués automatiquement. Le lint et le build
+Next.js sont exécutés dans le builder frontend. Il inspecte les utilisateurs,
+les sondes, l'historique des couches et les fichiers exportés, recherche les
+anciens exemples de secrets et vérifie l'absence de fichiers locaux sensibles.
+Cette inspection ciblée ne constitue pas une garantie universelle d'absence de
+secrets. Les outils pytest/httpx/flake8 sont installés uniquement dans les
+conteneurs de test et ne modifient pas l'image finale.
+Le script nettoie ses conteneurs, les volumes anonymes MongoDB et son réseau,
+même en cas d'échec ; les deux images restent disponibles localement.
+La CI conserve les contrôles applicatifs et sécurité et rend les deux builds
+Docker obligatoires : un Dockerfile absent fait échouer `test -f`.
+
+Tailles mesurées avec `docker image inspect` le 18 novembre 2026 (Linux amd64) :
+
+| Image | Taille réelle en octets | Mo décimaux |
+| --- | ---: | ---: |
+| `pfs-backend:us06` | 235465573 | 235,47 |
+| `pfs-frontend:us06` | 306661493 | 306,66 |
+
+Résultats réels et identifiants des images : voir [la validation US06](docs/us06-validation.md).
