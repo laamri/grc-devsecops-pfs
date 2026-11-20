@@ -48,6 +48,41 @@ jobs:
           trivy-results.sarif
         if-no-files-found: ignore
 
+  sast-scan:
+    name: SAST Code Analysis (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep SAST & Quality Gate
+        run: |
+          semgrep scan \
+            --config p/python \
+            --config p/fastapi \
+            --config p/typescript \
+            --config p/react \
+            --config p/owasp-top-ten \
+            --severity ERROR \
+            --error \
+            --sarif \
+            --output semgrep-results.sarif \
+            .
+
+      - name: Upload Semgrep SAST Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sast-semgrep-report
+          path: semgrep-results.sarif
+          if-no-files-found: warn
+  
+  
   # 1. CI for Python FastAPI Microservices
   backend-ci:
     runs-on: ubuntu-latest
