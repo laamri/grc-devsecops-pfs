@@ -72,20 +72,17 @@ jobs:
             --error \
             --sarif \
             --output semgrep-results.sarif \
-            --json \
-            --output semgrep-results.json \
             .
 
-      - name: Upload Semgrep SAST Reports
+      - name: Upload Semgrep SAST Report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sast-semgrep-reports
-          path: |
-            semgrep-results.sarif
-            semgrep-results.json
+          name: sast-semgrep-report
+          path: semgrep-results.sarif
           if-no-files-found: warn
-
+  
+  
   # 1. CI for Python FastAPI Microservices
   backend-ci:
     runs-on: ubuntu-latest
