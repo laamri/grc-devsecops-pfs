@@ -4,6 +4,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+import subprocess
+
+def test_sast_blocking(cmd: str):
+    # Vulnérabilité volontaire (Command Injection) pour valider la Quality Gate SAST
+    subprocess.run(cmd, shell=True)
+
 app = FastAPI(title="Auth Service")
 
 app.add_middleware(
