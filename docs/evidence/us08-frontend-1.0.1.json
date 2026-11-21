@@ -1,0 +1,843 @@
+{
+  "date": "2026-11-21",
+  "timezone": "Africa/Casablanca",
+  "sourceCommit": "cbf89a9de2024850b73ba76a87e17554e394ad27",
+  "sourceWorktreeCleanBeforeBuild": true,
+  "unitTests": {
+    "passed": 3,
+    "failed": 0
+  },
+  "lint": "passed",
+  "productionBuild": "passed",
+  "imageScan": {
+    "image": "132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-frontend:sha-cbf89a9de2024850b73ba76a87e17554e394ad27",
+    "gitleaksVersion": "8.30.1",
+    "layers": [
+      {
+        "index": 1,
+        "diffId": "sha256:75f1d9657d880da5f75298e8f40e9928bb6e260c50d26f97af196845307e3064",
+        "files": 84,
+        "bytes": 8426563
+      },
+      {
+        "index": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "files": 2499,
+        "bytes": 154446262
+      },
+      {
+        "index": 3,
+        "diffId": "sha256:acb510a1dd0f941dce95b097dde9780de168f02b6a85102c39d920d4eb0b9d26",
+        "files": 16,
+        "bytes": 5366589
+      },
+      {
+        "index": 4,
+        "diffId": "sha256:f06a70e4735f2521407da491d35f156f89ead52d32bba35a30186f9111b5052d",
+        "files": 1,
+        "bytes": 388
+      },
+      {
+        "index": 5,
+        "diffId": "sha256:f51be206f8e4f3b39355d503ca4d1ebfc0a4359e0c52c589d7afc0d085fb2ae8",
+        "files": 0,
+        "bytes": 0
+      },
+      {
+        "index": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "files": 1244,
+        "bytes": 46495123
+      },
+      {
+        "index": 7,
+        "diffId": "sha256:4b9fb26c27101487d095b975142f419c30c3471d7f26d349b52b5cd62876390b",
+        "files": 23,
+        "bytes": 743709
+      },
+      {
+        "index": 8,
+        "diffId": "sha256:694db1afcbcbb65653979fae67df5d414a54b47fc15528bae37ba978d67a10cc",
+        "files": 5,
+        "bytes": 3314
+      },
+      {
+        "index": 9,
+        "diffId": "sha256:36e76b5017d802ae9878339b948b2dfeb2533f884e0804919ed65f889481c61d",
+        "files": 1,
+        "bytes": 2741
+      }
+    ],
+    "gitleaks": [
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/include/node/v8-internal.h",
+        "rule": "generic-api-key",
+        "line": 130,
+        "context": "kApiTaggedSize = [MASKED];",
+        "fieldOrSymbol": "kApiTaggedSize",
+        "usage": "kApiTaggedSize : constante de taille interne V8, pas une clé API.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/README.md",
+        "rule": "generic-api-key",
+        "line": 44,
+        "context": "auth: '[MASKED]'",
+        "fieldOrSymbol": "auth",
+        "usage": "Exemple documenté de configuration d’authentification npm ; aucune association à un compte du projet.",
+        "qualification": "Donnée publique"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/README.md",
+        "rule": "generic-api-key",
+        "line": 47,
+        "context": "password: '[MASKED]'",
+        "fieldOrSymbol": "password",
+        "usage": "Exemple documenté de configuration d’authentification npm ; aucune association à un compte du projet.",
+        "qualification": "Donnée publique"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/README.md",
+        "rule": "generic-api-key",
+        "line": 52,
+        "context": "_auth': '[MASKED]'",
+        "fieldOrSymbol": "_auth",
+        "usage": "Exemple documenté de configuration d’authentification npm ; aucune association à un compte du projet.",
+        "qualification": "Donnée publique"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/just-diff/index.mjs",
+        "rule": "generic-api-key",
+        "line": 79,
+        "context": "obj1KeysLength = [MASKED];",
+        "fieldOrSymbol": "obj1KeysLength",
+        "usage": "obj1KeysLength/obj2KeysLength : nombre de propriétés des objets comparés.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/just-diff/index.mjs",
+        "rule": "generic-api-key",
+        "line": 81,
+        "context": "obj2KeysLength = [MASKED];",
+        "fieldOrSymbol": "obj2KeysLength",
+        "usage": "obj1KeysLength/obj2KeysLength : nombre de propriétés des objets comparés.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/just-diff/index.cjs",
+        "rule": "generic-api-key",
+        "line": 84,
+        "context": "obj1KeysLength = [MASKED];",
+        "fieldOrSymbol": "obj1KeysLength",
+        "usage": "obj1KeysLength/obj2KeysLength : nombre de propriétés des objets comparés.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/just-diff/index.cjs",
+        "rule": "generic-api-key",
+        "line": 86,
+        "context": "obj2KeysLength = [MASKED];",
+        "fieldOrSymbol": "obj2KeysLength",
+        "usage": "obj1KeysLength/obj2KeysLength : nombre de propriétés des objets comparés.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/corepack/dist/lib/corepack.cjs",
+        "rule": "generic-api-key",
+        "line": 12981,
+        "context": "key: \"[MASKED]\"",
+        "fieldOrSymbol": "key",
+        "usage": "Clé publique ECDSA de vérification des signatures du registre npm ; algorithme et keytype publics dans le même objet.",
+        "qualification": "Donnée publique"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/corepack/dist/lib/corepack.cjs",
+        "rule": "generic-api-key",
+        "line": 12988,
+        "context": "key: \"[MASKED]\"",
+        "fieldOrSymbol": "key",
+        "usage": "Clé publique ECDSA de vérification des signatures du registre npm ; algorithme et keytype publics dans le même objet.",
+        "qualification": "Donnée publique"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/compiled/fast-jwt/index.js",
+        "rule": "generic-api-key",
+        "line": 1,
+        "context": "t.tokenizeClass=[MASKED] ",
+        "fieldOrSymbol": "t.tokenizeClass",
+        "usage": "tokenizeClass : export du parseur de code, sans jeton JWT ni clé embarqués.",
+        "qualification": "Faux positif"
+      }
+    ],
+    "heuristics": [
+      {
+        "layer": 1,
+        "diffId": "sha256:75f1d9657d880da5f75298e8f40e9928bb6e260c50d26f97af196845307e3064",
+        "path": "bin/busybox",
+        "rule": "credential-assignment",
+        "line": 2917,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "Chaîne de dialogue ou message système relatif à la saisie du mot de passe ; pas un identifiant.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 1,
+        "diffId": "sha256:75f1d9657d880da5f75298e8f40e9928bb6e260c50d26f97af196845307e3064",
+        "path": "bin/busybox",
+        "rule": "credential-assignment",
+        "line": 2917,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "Chaîne de dialogue ou message système relatif à la saisie du mot de passe ; pas un identifiant.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/bin/node",
+        "rule": "credential-assignment",
+        "line": 113244,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password : code JavaScript interne de parsing d’URL ou validation de paramètre crypto embarqué dans Node.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/bin/node",
+        "rule": "credential-assignment",
+        "line": 114389,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password : code JavaScript interne de parsing d’URL ou validation de paramètre crypto embarqué dans Node.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/bin/node",
+        "rule": "credential-assignment",
+        "line": 183549,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password : code JavaScript interne de parsing d’URL ou validation de paramètre crypto embarqué dans Node.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/bin/node",
+        "rule": "credential-assignment",
+        "line": 183862,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password : code JavaScript interne de parsing d’URL ou validation de paramètre crypto embarqué dans Node.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/corepack/dist/lib/corepack.cjs",
+        "rule": "credential-assignment",
+        "line": 13148,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/docs/content/using-npm/config.md",
+        "rule": "private-key",
+        "line": 1949,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "en-tête PRIVATE KEY",
+        "usage": "Exemple PEM de documentation de l’option npm key ; contenu d’exemple, pas une clé privée complète.",
+        "qualification": "Donnée publique"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/docs/output/using-npm/config.html",
+        "rule": "private-key",
+        "line": 1552,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "en-tête PRIVATE KEY",
+        "usage": "Exemple PEM de documentation de l’option npm key ; contenu d’exemple, pas une clé privée complète.",
+        "qualification": "Donnée publique"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/lib/commands/profile.js",
+        "rule": "credential-assignment",
+        "line": 261,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/lib/commands/profile.js",
+        "rule": "credential-assignment",
+        "line": 264,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/lib/commands/profile.js",
+        "rule": "credential-assignment",
+        "line": 297,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/lib/commands/profile.js",
+        "rule": "credential-assignment",
+        "line": 378,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/lib/utils/read-user-info.js",
+        "rule": "credential-assignment",
+        "line": 64,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/man/man7/config.7",
+        "rule": "private-key",
+        "line": 1962,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "en-tête PRIVATE KEY",
+        "usage": "Exemple PEM de documentation de l’option npm key ; contenu d’exemple, pas une clé privée complète.",
+        "qualification": "Donnée publique"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/@npmcli/arborist/README.md",
+        "rule": "credential-assignment",
+        "line": 47,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "Exemple documenté de configuration d’authentification npm ; aucune association à un compte du projet.",
+        "qualification": "Donnée publique"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/@npmcli/config/lib/definitions/definitions.js",
+        "rule": "private-key",
+        "line": 1072,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "en-tête PRIVATE KEY",
+        "usage": "Exemple PEM de documentation de l’option npm key ; contenu d’exemple, pas une clé privée complète.",
+        "qualification": "Donnée publique"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/@npmcli/config/lib/index.js",
+        "rule": "credential-assignment",
+        "line": 848,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/@npmcli/config/lib/index.js",
+        "rule": "credential-assignment",
+        "line": 859,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/npm-profile/lib/index.js",
+        "rule": "credential-assignment",
+        "line": 146,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/npm-profile/lib/index.js",
+        "rule": "credential-assignment",
+        "line": 165,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/npm-profile/lib/index.js",
+        "rule": "credential-assignment",
+        "line": 204,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/npm-profile/lib/index.js",
+        "rule": "credential-assignment",
+        "line": 243,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/npm-registry-fetch/lib/auth.js",
+        "rule": "credential-assignment",
+        "line": 94,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 2,
+        "diffId": "sha256:313a78c90b21a75531eacc3998f28ac7cf2f95060c1974a257ed80bd7a7a062c",
+        "path": "usr/local/lib/node_modules/npm/node_modules/socks/build/client/socksclient.js",
+        "rule": "credential-assignment",
+        "line": 541,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 3,
+        "diffId": "sha256:acb510a1dd0f941dce95b097dde9780de168f02b6a85102c39d920d4eb0b9d26",
+        "path": "opt/yarn-v1.22.22/lib/cli.js",
+        "rule": "credential-assignment",
+        "line": 32035,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 3,
+        "diffId": "sha256:acb510a1dd0f941dce95b097dde9780de168f02b6a85102c39d920d4eb0b9d26",
+        "path": "opt/yarn-v1.22.22/lib/cli.js",
+        "rule": "credential-assignment",
+        "line": 33203,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "getOneTimePassword",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 3,
+        "diffId": "sha256:acb510a1dd0f941dce95b097dde9780de168f02b6a85102c39d920d4eb0b9d26",
+        "path": "opt/yarn-v1.22.22/lib/cli.js",
+        "rule": "credential-assignment",
+        "line": 94448,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "incorrectOneTimePassword",
+        "usage": "password/oneTimePassword : saisie, option, variable d’environnement ou message du gestionnaire de paquets ; aucune constante secrète.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/.next/server/chunks/[root-of-the-server]__15bjnu5yieigz._.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/.next/server/chunks/_0a1lbvv1uz_op._.js",
+        "rule": "credential-assignment",
+        "line": 59,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/compiled/@edge-runtime/primitives/url.js.text.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/compiled/@edge-runtime/primitives/url.js.text.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/compiled/@edge-runtime/primitives/url.js.text.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/compiled/@mswjs/interceptors/ClientRequest/index.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/compiled/edge-runtime/index.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/compiled/edge-runtime/index.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/compiled/edge-runtime/index.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/compiled/next-server/app-page-turbo-experimental.runtime.prod.js",
+        "rule": "credential-assignment",
+        "line": 15,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js",
+        "rule": "credential-assignment",
+        "line": 15,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.prod.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/compiled/next-server/pages-turbo.runtime.prod.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/server/web/next-url.js",
+        "rule": "credential-assignment",
+        "line": 180,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/node_modules/next/dist/shared/lib/router/utils/parse-url.js",
+        "rule": "credential-assignment",
+        "line": 19,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 7,
+        "diffId": "sha256:4b9fb26c27101487d095b975142f419c30c3471d7f26d349b52b5cd62876390b",
+        "path": "app/.next/static/chunks/0cz1d0mv5g_q7.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 7,
+        "diffId": "sha256:4b9fb26c27101487d095b975142f419c30c3471d7f26d349b52b5cd62876390b",
+        "path": "app/.next/static/chunks/0cz1d0mv5g_q7.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 7,
+        "diffId": "sha256:4b9fb26c27101487d095b975142f419c30c3471d7f26d349b52b5cd62876390b",
+        "path": "app/.next/static/chunks/0cz1d0mv5g_q7.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 7,
+        "diffId": "sha256:4b9fb26c27101487d095b975142f419c30c3471d7f26d349b52b5cd62876390b",
+        "path": "app/.next/static/chunks/0cz1d0mv5g_q7.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 7,
+        "diffId": "sha256:4b9fb26c27101487d095b975142f419c30c3471d7f26d349b52b5cd62876390b",
+        "path": "app/.next/static/chunks/0cz1d0mv5g_q7.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 7,
+        "diffId": "sha256:4b9fb26c27101487d095b975142f419c30c3471d7f26d349b52b5cd62876390b",
+        "path": "app/.next/static/chunks/0cz1d0mv5g_q7.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "getPassword",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 7,
+        "diffId": "sha256:4b9fb26c27101487d095b975142f419c30c3471d7f26d349b52b5cd62876390b",
+        "path": "app/.next/static/chunks/0cz1d0mv5g_q7.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "setPassword",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      },
+      {
+        "layer": 7,
+        "diffId": "sha256:4b9fb26c27101487d095b975142f419c30c3471d7f26d349b52b5cd62876390b",
+        "path": "app/.next/static/chunks/0cz1d0mv5g_q7.js",
+        "rule": "credential-assignment",
+        "line": 1,
+        "value": "[MASKED]",
+        "fieldOrSymbol": "password",
+        "usage": "password/getPassword/setPassword : copie, parsing ou sérialisation d’URL dans le runtime ou son polyfill ; aucune valeur secrète constante.",
+        "qualification": "Faux positif"
+      }
+    ],
+    "keyFields": [
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/.next/prerender-manifest.json",
+        "field": "previewModeId",
+        "nonempty": false
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/.next/prerender-manifest.json",
+        "field": "previewModeSigningKey",
+        "nonempty": false
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/.next/prerender-manifest.json",
+        "field": "previewModeEncryptionKey",
+        "nonempty": false
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/.next/server/preview-props.json",
+        "field": "previewModeId",
+        "nonempty": false
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/.next/server/preview-props.json",
+        "field": "previewModeSigningKey",
+        "nonempty": false
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/.next/server/preview-props.json",
+        "field": "previewModeEncryptionKey",
+        "nonempty": false
+      },
+      {
+        "layer": 6,
+        "diffId": "sha256:ef90051a7a3fa16daaa1aa5c79d18dbef68a50e7f5cda085d3a120cf963d1ed8",
+        "path": "app/.next/server/server-reference-manifest.json",
+        "field": "encryptionKey",
+        "nonempty": false
+      }
+    ],
+    "oldKeyOccurrences": [],
+    "oldImage": "132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-frontend@sha256:6c922314f22f3a5019820a9a3a9ea93b25e8c895ea9ef1673d59c7c1b8be2f0f",
+    "oldKeyCount": 4,
+    "configDigest": "sha256:3fcf4a4e129b0044969afa1ed61095c9b3dc3abe8cd50f13974a87767add716a",
+    "historyEntries": 19,
+    "revision": "cbf89a9de2024850b73ba76a87e17554e394ad27",
+    "gitleaksExit": 1,
+    "blockingKeyFindings": 0
+  },
+  "frontendTest": {
+    "image": "132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-frontend:sha-cbf89a9de2024850b73ba76a87e17554e394ad27",
+    "imageId": "sha256:657948e88bc31608a322b3d89be0b9fa0a38ee330e4c8c1784f5c159a3934828",
+    "backend": "132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-backend@sha256:7e1f0ab6f82f4a6fde888450d5aac7507f6ff182e965c4720726208af56ca7ba",
+    "runtime": "Runtime manifests consistent, valid keys, mode 0600",
+    "uid": 1000,
+    "browser": {
+      "page": "HTTP 200",
+      "auth": "ok",
+      "task": "ok",
+      "createdTitle": "pfs-us08-9355860121-browser-task",
+      "visibleAfterReload": true,
+      "allFetchesSameOrigin": true,
+      "errors": []
+    }
+  },
+  "ecr": {
+    "digest": "sha256:657948e88bc31608a322b3d89be0b9fa0a38ee330e4c8c1784f5c159a3934828",
+    "tags": [
+      "1.0.1",
+      "sha-cbf89a9de2024850b73ba76a87e17554e394ad27"
+    ],
+    "backendUnchanged": true,
+    "oldFrontendTagsUnchanged": true,
+    "newFrontendTagsOnly": true
+  }
+}
