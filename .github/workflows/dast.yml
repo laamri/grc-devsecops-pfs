@@ -1,0 +1,77 @@
+name: DAST - Test Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "Authorized test-environment URL (or leave empty to use DAST_TARGET_URL)"
+        required: false
+        type: string
+  schedule:
+    - cron: "17 2 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  dast:
+    name: OWASP ZAP baseline scan
+    if: github.event_name == 'workflow_dispatch' || vars.DAST_TARGET_URL != ''
+    runs-on: ubuntu-latest
+    env:
+      REQUESTED_TARGET: ${{ inputs.target_url || vars.DAST_TARGET_URL }}
+    steps:
+      - name: Validate authorized target
+        shell: bash
+        run: |
+          set -euo pipefail
+          target="${REQUESTED_TARGET:-}"
+          if [[ ! "$target" =~ ^https?://[^[:space:]]+$ ]]; then
+            echo "::error::Set DAST_TARGET_URL to an authorized http(s) test-environment URL or provide workflow input target_url."
+            exit 1
+          fi
+          {
+            echo "TARGET_URL=$target"
+            echo "Target validated as an explicit http(s) URL."
+          } >> "$GITHUB_ENV"
+
+      - name: Run non-destructive OWASP ZAP baseline scan
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dast-report
+          docker run --rm --network host \
+            -v "$PWD/dast-report:/zap/wrk/:rw" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py \
+              -t "$TARGET_URL" \
+              -m 5 \
+              -J dast-report.json \
+              -r dast-report.html \
+              -I
+
+      - name: Enforce critical and high findings gate
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="dast-report/dast-report.json"
+          if [[ ! -f "$report" ]]; then
+            echo "::error::DAST JSON report was not generated."
+            exit 1
+          fi
+          high_count=$(jq '[.site[]?.alerts[]? | select(.riskcode == "3" or .riskcode == "2")] | length' "$report")
+          echo "High/Critical findings: $high_count"
+          if (( high_count > 0 )); then
+            jq -r '.site[]?.alerts[]? | select(.riskcode == "3" or .riskcode == "2") | "- [\(.riskcode)] \(.name)"' "$report"
+            exit 1
+          fi
+
+      - name: Upload DAST evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dast-reports-${{ github.run_id }}
+          path: dast-report/
+          if-no-files-found: error
+          retention-days: 30
