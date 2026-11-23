@@ -51,6 +51,50 @@ jobs:
           trivy-results.sarif
         if-no-files-found: ignore
 
+  
+  iac-scan:
+    name: Terraform IaC Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Scan Terraform with Trivy
+        id: terraform_scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        continue-on-error: true
+        with:
+          scan-type: config
+          scan-ref: ./infra/terraform
+          skip-dirs: "**/.terraform"
+          severity: HIGH,CRITICAL
+          format: json
+          output: terraform-scan.json
+          exit-code: '1'
+
+      - name: Upload Terraform security report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-security-report
+          path: terraform-scan.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Enforce Terraform security gate
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.terraform_scan.outcome }}" != "success" ]; then
+            echo "::error::Terraform security scan failed."
+            exit 1
+          fi
+          echo "Terraform security quality gate passed."
+
+
   sast-scan:
     name: SAST Code Analysis (Semgrep)
     runs-on: ubuntu-latest
@@ -172,7 +216,7 @@ jobs:
   docker-images:
     name: Build both images after all quality gates
     runs-on: ubuntu-latest
-    needs: [backend-ci, frontend-ci, security-scan, sast-scan]
+    needs: [backend-ci, frontend-ci, security-scan, sast-scan,iac-scan]
     # Default success() semantics skip this job if any required job fails/is skipped.
     permissions:
       contents: read
@@ -339,7 +383,7 @@ jobs:
   security-evidence:
     name: Collect traceable security evidence
     if: always()
-    needs: [backend-ci, frontend-ci, security-scan, sast-scan]
+    needs: [backend-ci, frontend-ci, security-scan, sast-scan, iac-scan]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -379,6 +423,8 @@ jobs:
         with:
           name: security-scan-reports
           path: evidence/security/secrets-and-dependencies
+
+        
 
       - name: Download SAST evidence
         if: always()
