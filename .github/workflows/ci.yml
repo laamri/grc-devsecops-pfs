@@ -424,7 +424,15 @@ jobs:
           name: security-scan-reports
           path: evidence/security/secrets-and-dependencies
 
-        
+      
+      - name: Download Terraform security evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-security-report
+          path: evidence/security/terraform
+ 
 
       - name: Download SAST evidence
         if: always()
