@@ -441,7 +441,7 @@ jobs:
   security-evidence:
     name: Collect traceable security evidence
     if: always()
-    needs: [backend-ci, frontend-ci, security-scan, sast-scan, iac-scan]
+    needs: [backend-ci, frontend-ci, security-scan, sast-scan, iac-scan , docker-images]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -490,6 +490,16 @@ jobs:
         with:
           name: terraform-security-report
           path: evidence/security/terraform
+
+      
+      - name: Download Docker image security evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-security-reports
+          path: evidence/security/docker-images
+
  
 
       - name: Download SAST evidence
