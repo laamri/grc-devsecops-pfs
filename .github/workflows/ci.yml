@@ -335,3 +335,98 @@ jobs:
             printf '| Repository | Tag | Verified ECR digest |\n|---|---|---|\n'
             cat "$rows"
           } >> "$GITHUB_STEP_SUMMARY"
+
+  security-evidence:
+    name: Collect traceable security evidence
+    if: always()
+    needs: [backend-ci, frontend-ci, security-scan, sast-scan]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout repository at tested commit
+        uses: actions/checkout@v4
+
+      - name: Download backend test evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: auth_service-test-report
+          path: evidence/ci/auth_service
+
+      - name: Download task service test evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: task_service-test-report
+          path: evidence/ci/task_service
+
+      - name: Download frontend validation evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-test-report
+          path: evidence/ci/frontend
+
+      - name: Download secret and dependency scan evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: security-scan-reports
+          path: evidence/security/secrets-and-dependencies
+
+      - name: Download SAST evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: sast-semgrep-report
+          path: evidence/security/sast
+
+      - name: Build evidence index and checksums
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/metadata evidence/infrastructure
+          cp -R .github evidence/infrastructure/github-workflows
+          if [[ -d infra ]]; then cp -R infra evidence/infrastructure/terraform; fi
+          cat > evidence/metadata/run.json <<EOF
+          {
+            "repository": "${GITHUB_REPOSITORY}",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "run_id": "${GITHUB_RUN_ID}",
+            "run_attempt": "${GITHUB_RUN_ATTEMPT}",
+            "commit": "${GITHUB_SHA}",
+            "ref": "${GITHUB_REF}",
+            "event": "${GITHUB_EVENT_NAME}",
+            "collected_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cat > evidence/README.md <<'EOF'
+          # Security evidence index
+
+          This archive is tied to the commit and workflow run in
+          `metadata/run.json`. It contains CI test reports, frontend validation,
+          secret/dependency scans, SAST output, and the versioned infrastructure
+          and workflow definitions used for the run.
+
+          `SHA256SUMS` provides integrity checks for every collected file.
+          Missing reports are recorded by the corresponding upstream job status;
+          the evidence collector itself still archives the available controls.
+          EOF
+          find evidence -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > evidence/SHA256SUMS
+
+      - name: Upload centralized evidence archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-evidence-${{ github.run_id }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 90
