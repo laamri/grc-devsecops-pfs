@@ -13,10 +13,29 @@ spec:
         app: auth-service
     spec:
       serviceAccountName: pfs-app
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: auth
           image: 132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-backend:latest
           command: ["uvicorn", "auth_service.main:app", "--host", "0.0.0.0", "--port", "8001"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           ports:
             - name: http
               containerPort: 8001
@@ -66,10 +85,29 @@ spec:
         app: task-service
     spec:
       serviceAccountName: pfs-app
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: task
           image: 132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-backend:latest
           command: ["uvicorn", "task_service.main:app", "--host", "0.0.0.0", "--port", "8002"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           ports:
             - name: http
               containerPort: 8002
@@ -119,9 +157,28 @@ spec:
         app: frontend
     spec:
       serviceAccountName: pfs-app
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: frontend
           image: 132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-frontend:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
           ports:
             - name: http
               containerPort: 3000
@@ -162,15 +219,40 @@ spec:
         app: mongodb
     spec:
       serviceAccountName: pfs-app
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: mongodb
           image: mongo:7.0
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1
+              memory: 1Gi
           ports:
             - name: mongo
               containerPort: 27017
           volumeMounts:
             - name: data
               mountPath: /data/db
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
   volumeClaimTemplates:
     - metadata:
         name: data
