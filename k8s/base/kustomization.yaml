@@ -7,3 +7,6 @@ resources:
   - secret-store.yaml
   - external-secret.yaml
   - workloads.yaml
+  - issuer.yaml
+  - certificate.yaml
+  - ingress.yaml

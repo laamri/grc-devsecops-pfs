@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-staging
+  namespace: pfs
+spec:
+  acme:
+    # Use the staging endpoint for validation; switch to production after DNS
+    # and HTTP-01 challenge handling have been verified.
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: platform@example.com
+    privateKeySecretRef:
+      name: pfs-acme-account
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: nginx
