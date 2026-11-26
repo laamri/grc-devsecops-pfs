@@ -4,6 +4,8 @@ namespace: pfs
 resources:
   - namespace.yaml
   - service-accounts.yaml
+  - cluster-roles.yaml
+  - rbac.yaml
   - secret-store.yaml
   - external-secret.yaml
   - workloads.yaml
