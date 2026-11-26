@@ -1,0 +1,257 @@
+﻿SCRUM-32 RBAC tests | UTC: 2026-11-26T21:21:55.4350968Z
+Context: minikube | Namespaces: default, kube-node-lease, kube-public, kube-system, pfs, pfs-dev, pfs-prod
+Checks use impersonation; no workloads or permissions are changed.
+
+--- Pod Reader Tests ---
+[PASS] Reader can list Pods in pfs
+[PASS] Reader cannot delete Pods
+[PASS] Reader cannot create Pods
+[PASS] Reader cannot get individual Pods
+[PASS] Reader cannot list Secrets
+[PASS] Reader cannot list Pods in PROD
+[PASS] Reader cannot list system Pods
+[PASS] Reader cannot list Nodes
+
+--- Developer Tests ---
+[PASS] Developer can list Pods
+[PASS] Developer can read Pod logs
+[PASS] Developer cannot read Secrets
+[PASS] Developer cannot delete Pods
+[PASS] Developer cannot execute commands in Pods
+[PASS] Developer cannot modify RBAC
+
+--- Observer Tests ---
+[PASS] Observer can list Pods
+[PASS] Observer can list Deployments
+[PASS] Observer cannot delete Pods
+[PASS] Observer cannot read Pod logs
+[PASS] Observer cannot read Secrets
+
+--- CI/CD Tests ---
+[PASS] CI/CD can patch frontend
+[PASS] CI/CD can patch auth-service
+[PASS] CI/CD can patch task-service
+[PASS] CI/CD cannot patch other Deployments
+[PASS] CI/CD cannot modify MongoDB
+[PASS] CI/CD cannot read Secrets directly
+[PASS] CI/CD cannot create RoleBindings
+[PASS] CI/CD cannot create ClusterRoleBindings
+
+--- Environment Separation Tests ---
+[PASS] Developer can access DEV
+[PASS] Developer cannot access PROD
+[PASS] dev observer can access own environment
+[PASS] dev observer cannot access other environment
+[PASS] dev CI/CD can patch frontend in own environment
+[PASS] dev CI/CD cannot patch frontend in other environment
+[PASS] dev CI/CD cannot patch unapproved Deployments
+[PASS] dev CI/CD cannot modify RBAC
+[PASS] prod observer can access own environment
+[PASS] prod observer cannot access other environment
+[PASS] prod CI/CD can patch frontend in own environment
+[PASS] prod CI/CD cannot patch frontend in other environment
+[PASS] prod CI/CD cannot patch unapproved Deployments
+[PASS] prod CI/CD cannot modify RBAC
+
+--- Application ServiceAccount Tests ---
+[PASS] frontend-sa cannot list Pods
+[PASS] frontend-sa cannot list Secrets
+[PASS] frontend-sa cannot delete Pods
+[PASS] frontend-sa cannot modify RBAC
+[PASS] frontend-sa cannot access PROD Pods
+[PASS] auth-sa cannot list Pods
+[PASS] auth-sa cannot list Secrets
+[PASS] auth-sa cannot delete Pods
+[PASS] auth-sa cannot modify RBAC
+[PASS] auth-sa cannot access PROD Pods
+[PASS] task-sa cannot list Pods
+[PASS] task-sa cannot list Secrets
+[PASS] task-sa cannot delete Pods
+[PASS] task-sa cannot modify RBAC
+[PASS] task-sa cannot access PROD Pods
+[PASS] mongodb-sa cannot list Pods
+[PASS] mongodb-sa cannot list Secrets
+[PASS] mongodb-sa cannot delete Pods
+[PASS] mongodb-sa cannot modify RBAC
+[PASS] mongodb-sa cannot access PROD Pods
+
+--- Default ServiceAccount Tests ---
+[PASS] default default cannot list Pods in default
+[PASS] default default cannot list Secrets in default
+[PASS] default default cannot create RoleBindings in default
+[PASS] default default cannot list Pods in kube-node-lease
+[PASS] default default cannot list Secrets in kube-node-lease
+[PASS] default default cannot create RoleBindings in kube-node-lease
+[PASS] default default cannot list Pods in kube-public
+[PASS] default default cannot list Secrets in kube-public
+[PASS] default default cannot create RoleBindings in kube-public
+[PASS] default default cannot list Pods in kube-system
+[PASS] default default cannot list Secrets in kube-system
+[PASS] default default cannot create RoleBindings in kube-system
+[PASS] default default cannot list Pods in pfs
+[PASS] default default cannot list Secrets in pfs
+[PASS] default default cannot create RoleBindings in pfs
+[PASS] default default cannot list Pods in pfs-dev
+[PASS] default default cannot list Secrets in pfs-dev
+[PASS] default default cannot create RoleBindings in pfs-dev
+[PASS] default default cannot list Pods in pfs-prod
+[PASS] default default cannot list Secrets in pfs-prod
+[PASS] default default cannot create RoleBindings in pfs-prod
+[PASS] default default cannot delete Nodes
+[PASS] default default cannot create ClusterRoleBindings
+[PASS] default default has no wildcard administrator access
+[PASS] kube-node-lease default cannot list Pods in default
+[PASS] kube-node-lease default cannot list Secrets in default
+[PASS] kube-node-lease default cannot create RoleBindings in default
+[PASS] kube-node-lease default cannot list Pods in kube-node-lease
+[PASS] kube-node-lease default cannot list Secrets in kube-node-lease
+[PASS] kube-node-lease default cannot create RoleBindings in kube-node-lease
+[PASS] kube-node-lease default cannot list Pods in kube-public
+[PASS] kube-node-lease default cannot list Secrets in kube-public
+[PASS] kube-node-lease default cannot create RoleBindings in kube-public
+[PASS] kube-node-lease default cannot list Pods in kube-system
+[PASS] kube-node-lease default cannot list Secrets in kube-system
+[PASS] kube-node-lease default cannot create RoleBindings in kube-system
+[PASS] kube-node-lease default cannot list Pods in pfs
+[PASS] kube-node-lease default cannot list Secrets in pfs
+[PASS] kube-node-lease default cannot create RoleBindings in pfs
+[PASS] kube-node-lease default cannot list Pods in pfs-dev
+[PASS] kube-node-lease default cannot list Secrets in pfs-dev
+[PASS] kube-node-lease default cannot create RoleBindings in pfs-dev
+[PASS] kube-node-lease default cannot list Pods in pfs-prod
+[PASS] kube-node-lease default cannot list Secrets in pfs-prod
+[PASS] kube-node-lease default cannot create RoleBindings in pfs-prod
+[PASS] kube-node-lease default cannot delete Nodes
+[PASS] kube-node-lease default cannot create ClusterRoleBindings
+[PASS] kube-node-lease default has no wildcard administrator access
+[PASS] kube-public default cannot list Pods in default
+[PASS] kube-public default cannot list Secrets in default
+[PASS] kube-public default cannot create RoleBindings in default
+[PASS] kube-public default cannot list Pods in kube-node-lease
+[PASS] kube-public default cannot list Secrets in kube-node-lease
+[PASS] kube-public default cannot create RoleBindings in kube-node-lease
+[PASS] kube-public default cannot list Pods in kube-public
+[PASS] kube-public default cannot list Secrets in kube-public
+[PASS] kube-public default cannot create RoleBindings in kube-public
+[PASS] kube-public default cannot list Pods in kube-system
+[PASS] kube-public default cannot list Secrets in kube-system
+[PASS] kube-public default cannot create RoleBindings in kube-system
+[PASS] kube-public default cannot list Pods in pfs
+[PASS] kube-public default cannot list Secrets in pfs
+[PASS] kube-public default cannot create RoleBindings in pfs
+[PASS] kube-public default cannot list Pods in pfs-dev
+[PASS] kube-public default cannot list Secrets in pfs-dev
+[PASS] kube-public default cannot create RoleBindings in pfs-dev
+[PASS] kube-public default cannot list Pods in pfs-prod
+[PASS] kube-public default cannot list Secrets in pfs-prod
+[PASS] kube-public default cannot create RoleBindings in pfs-prod
+[PASS] kube-public default cannot delete Nodes
+[PASS] kube-public default cannot create ClusterRoleBindings
+[PASS] kube-public default has no wildcard administrator access
+[PASS] kube-system default cannot list Pods in default
+[PASS] kube-system default cannot list Secrets in default
+[PASS] kube-system default cannot create RoleBindings in default
+[PASS] kube-system default cannot list Pods in kube-node-lease
+[PASS] kube-system default cannot list Secrets in kube-node-lease
+[PASS] kube-system default cannot create RoleBindings in kube-node-lease
+[PASS] kube-system default cannot list Pods in kube-public
+[PASS] kube-system default cannot list Secrets in kube-public
+[PASS] kube-system default cannot create RoleBindings in kube-public
+[PASS] kube-system default cannot list Pods in kube-system
+[PASS] kube-system default cannot list Secrets in kube-system
+[PASS] kube-system default cannot create RoleBindings in kube-system
+[PASS] kube-system default cannot list Pods in pfs
+[PASS] kube-system default cannot list Secrets in pfs
+[PASS] kube-system default cannot create RoleBindings in pfs
+[PASS] kube-system default cannot list Pods in pfs-dev
+[PASS] kube-system default cannot list Secrets in pfs-dev
+[PASS] kube-system default cannot create RoleBindings in pfs-dev
+[PASS] kube-system default cannot list Pods in pfs-prod
+[PASS] kube-system default cannot list Secrets in pfs-prod
+[PASS] kube-system default cannot create RoleBindings in pfs-prod
+[PASS] kube-system default cannot delete Nodes
+[PASS] kube-system default cannot create ClusterRoleBindings
+[PASS] kube-system default has no wildcard administrator access
+[PASS] pfs default cannot list Pods in default
+[PASS] pfs default cannot list Secrets in default
+[PASS] pfs default cannot create RoleBindings in default
+[PASS] pfs default cannot list Pods in kube-node-lease
+[PASS] pfs default cannot list Secrets in kube-node-lease
+[PASS] pfs default cannot create RoleBindings in kube-node-lease
+[PASS] pfs default cannot list Pods in kube-public
+[PASS] pfs default cannot list Secrets in kube-public
+[PASS] pfs default cannot create RoleBindings in kube-public
+[PASS] pfs default cannot list Pods in kube-system
+[PASS] pfs default cannot list Secrets in kube-system
+[PASS] pfs default cannot create RoleBindings in kube-system
+[PASS] pfs default cannot list Pods in pfs
+[PASS] pfs default cannot list Secrets in pfs
+[PASS] pfs default cannot create RoleBindings in pfs
+[PASS] pfs default cannot list Pods in pfs-dev
+[PASS] pfs default cannot list Secrets in pfs-dev
+[PASS] pfs default cannot create RoleBindings in pfs-dev
+[PASS] pfs default cannot list Pods in pfs-prod
+[PASS] pfs default cannot list Secrets in pfs-prod
+[PASS] pfs default cannot create RoleBindings in pfs-prod
+[PASS] pfs default cannot delete Nodes
+[PASS] pfs default cannot create ClusterRoleBindings
+[PASS] pfs default has no wildcard administrator access
+[PASS] pfs-dev default cannot list Pods in default
+[PASS] pfs-dev default cannot list Secrets in default
+[PASS] pfs-dev default cannot create RoleBindings in default
+[PASS] pfs-dev default cannot list Pods in kube-node-lease
+[PASS] pfs-dev default cannot list Secrets in kube-node-lease
+[PASS] pfs-dev default cannot create RoleBindings in kube-node-lease
+[PASS] pfs-dev default cannot list Pods in kube-public
+[PASS] pfs-dev default cannot list Secrets in kube-public
+[PASS] pfs-dev default cannot create RoleBindings in kube-public
+[PASS] pfs-dev default cannot list Pods in kube-system
+[PASS] pfs-dev default cannot list Secrets in kube-system
+[PASS] pfs-dev default cannot create RoleBindings in kube-system
+[PASS] pfs-dev default cannot list Pods in pfs
+[PASS] pfs-dev default cannot list Secrets in pfs
+[PASS] pfs-dev default cannot create RoleBindings in pfs
+[PASS] pfs-dev default cannot list Pods in pfs-dev
+[PASS] pfs-dev default cannot list Secrets in pfs-dev
+[PASS] pfs-dev default cannot create RoleBindings in pfs-dev
+[PASS] pfs-dev default cannot list Pods in pfs-prod
+[PASS] pfs-dev default cannot list Secrets in pfs-prod
+[PASS] pfs-dev default cannot create RoleBindings in pfs-prod
+[PASS] pfs-dev default cannot delete Nodes
+[PASS] pfs-dev default cannot create ClusterRoleBindings
+[PASS] pfs-dev default has no wildcard administrator access
+[PASS] pfs-prod default cannot list Pods in default
+[PASS] pfs-prod default cannot list Secrets in default
+[PASS] pfs-prod default cannot create RoleBindings in default
+[PASS] pfs-prod default cannot list Pods in kube-node-lease
+[PASS] pfs-prod default cannot list Secrets in kube-node-lease
+[PASS] pfs-prod default cannot create RoleBindings in kube-node-lease
+[PASS] pfs-prod default cannot list Pods in kube-public
+[PASS] pfs-prod default cannot list Secrets in kube-public
+[PASS] pfs-prod default cannot create RoleBindings in kube-public
+[PASS] pfs-prod default cannot list Pods in kube-system
+[PASS] pfs-prod default cannot list Secrets in kube-system
+[PASS] pfs-prod default cannot create RoleBindings in kube-system
+[PASS] pfs-prod default cannot list Pods in pfs
+[PASS] pfs-prod default cannot list Secrets in pfs
+[PASS] pfs-prod default cannot create RoleBindings in pfs
+[PASS] pfs-prod default cannot list Pods in pfs-dev
+[PASS] pfs-prod default cannot list Secrets in pfs-dev
+[PASS] pfs-prod default cannot create RoleBindings in pfs-dev
+[PASS] pfs-prod default cannot list Pods in pfs-prod
+[PASS] pfs-prod default cannot list Secrets in pfs-prod
+[PASS] pfs-prod default cannot create RoleBindings in pfs-prod
+[PASS] pfs-prod default cannot delete Nodes
+[PASS] pfs-prod default cannot create ClusterRoleBindings
+[PASS] pfs-prod default has no wildcard administrator access
+
+========================================
+       RBAC SECURITY TEST REPORT
+========================================
+Total tests : 229
+Passed      : 229
+Failed      : 0
+Errors      : 0
+Coverage is the operations tested, not proof of every possible privilege.
+RESULT: PASSED
+
