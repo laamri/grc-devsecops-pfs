@@ -6,6 +6,9 @@ on:
     branches: [ "main", "develop" ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   security-scan:
     name: Secrets and dependency scan
@@ -48,6 +51,41 @@ jobs:
           trivy-results.sarif
         if-no-files-found: ignore
 
+  sast-scan:
+    name: SAST Code Analysis (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep SAST & Quality Gate
+        run: |
+          semgrep scan \
+            --config p/python \
+            --config p/fastapi \
+            --config p/typescript \
+            --config p/react \
+            --config p/owasp-top-ten \
+            --severity ERROR \
+            --error \
+            --sarif \
+            --output semgrep-results.sarif \
+            .
+
+      - name: Upload Semgrep SAST Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sast-semgrep-report
+          path: semgrep-results.sarif
+          if-no-files-found: warn
+  
+  
   # 1. CI for Python FastAPI Microservices
   backend-ci:
     runs-on: ubuntu-latest
@@ -131,17 +169,264 @@ jobs:
           frontend-build.log
         if-no-files-found: error
 
-    - name: Verify Docker Build (Frontend)
-      run: |
-        test -f frontend/Dockerfile
-        docker build -t pfs-frontend:test frontend
-
-  backend-image:
+  docker-images:
+    name: Build both images after all quality gates
     runs-on: ubuntu-latest
-    needs: backend-ci
+    needs: [backend-ci, frontend-ci, security-scan, sast-scan]
+    # Default success() semantics skip this job if any required job fails/is skipped.
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
-      - name: Build shared backend image
+      - name: Build backend and frontend without AWS
+        shell: bash
         run: |
+          set -euo pipefail
           test -f backend/Dockerfile
-          docker build -f backend/Dockerfile -t pfs-backend:test .
+          test -f frontend/Dockerfile
+          docker build --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            -f backend/Dockerfile -t pfs-backend:ci .
+          docker build --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            -f frontend/Dockerfile -t pfs-frontend:ci frontend/
+
+      - name: Save images for the develop publication job
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+        run: docker save -o images.tar pfs-backend:ci pfs-frontend:ci
+
+      - name: Upload images for this workflow run
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+        uses: actions/upload-artifact@v4
+        with:
+          # Stable across attempts so "rerun failed jobs" can reuse the build.
+          name: ci-images-${{ github.run_id }}
+          overwrite: true
+          path: images.tar
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: error
+
+  publish-images:
+    name: Publish immutable ECR images on develop
+    runs-on: ubuntu-latest
+    needs: docker-images
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    permissions:
+      contents: read
+      id-token: write
+    # Serialize publishers without cancelling a run between its two image pushes.
+    concurrency:
+      group: ecr-images-develop
+      cancel-in-progress: false
+    env:
+      AWS_REGION: eu-north-1
+      AWS_ACCOUNT_ID: '132415609490'
+      ECR_REGISTRY: 132415609490.dkr.ecr.eu-north-1.amazonaws.com
+      AWS_PAGER: ''
+    steps:
+      # Set this repository variable to the verified ARN of safeops-ci-role
+      # (planned in docs/iam-permissions-matrix.md). Its ECR scope must cover pfs-*.
+      # AWS setup (not performed by this workflow):
+      # - IAM OIDC provider https://token.actions.githubusercontent.com,
+      #   audience sts.amazonaws.com, in account 132415609490.
+      # - Trust action sts:AssumeRoleWithWebIdentity, federated principal
+      #   arn:aws:iam::132415609490:oidc-provider/token.actions.githubusercontent.com.
+      # - StringEquals token.actions.githubusercontent.com:aud = sts.amazonaws.com
+      #   and token.actions.githubusercontent.com:sub =
+      #   repo:laamri@122491199/grc-devsecops-pfs@1447407909:ref:refs/heads/develop
+      #   (immutable subject prefix verified through GitHub's OIDC settings API;
+      #   no GitHub environment is used by this job).
+      # - ecr:GetAuthorizationToken on resource "*".
+      # - ecr:DescribeRepositories, ecr:DescribeImages, ecr:BatchGetImage,
+      #   ecr:GetDownloadUrlForLayer, ecr:BatchCheckLayerAvailability,
+      #   ecr:InitiateLayerUpload, ecr:UploadLayerPart, ecr:CompleteLayerUpload,
+      #   ecr:PutImage on these two resources only:
+      #   arn:aws:ecr:eu-north-1:132415609490:repository/pfs-backend
+      #   arn:aws:ecr:eu-north-1:132415609490:repository/pfs-frontend
+      - name: Require the publication role configuration
+        env:
+          ROLE_ARN: ${{ vars.AWS_ECR_PUBLISH_ROLE_ARN }}
+        run: |
+          if [[ ! "$ROLE_ARN" =~ ^arn:aws:iam::132415609490:role/.+ ]]; then
+            echo '::error::Configure repository variable AWS_ECR_PUBLISH_ROLE_ARN with the ECR publisher role ARN in account 132415609490.'
+            exit 1
+          fi
+
+      - name: Obtain temporary AWS credentials through GitHub OIDC
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ECR_PUBLISH_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          allowed-account-ids: '132415609490'
+          role-session-name: github-${{ github.run_id }}-${{ github.run_attempt }}
+          role-duration-seconds: 3600
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registries: '132415609490'
+
+      - name: Download the images built by the quality-gated job
+        uses: actions/download-artifact@v4
+        with:
+          name: ci-images-${{ github.run_id }}
+
+      - name: Publish missing tags and verify both remote digests
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker load -i images.tar
+          tag="sha-${GITHUB_SHA:0:12}"
+          rows=$(mktemp)
+          trap 'rm -f "$rows"' EXIT
+
+          # Only a missing image is a cache miss; IAM/network/other errors fail closed.
+          remote_digest() {
+            local repo="$1" output error_file
+            error_file=$(mktemp)
+            if output=$(aws ecr describe-images --registry-id "$AWS_ACCOUNT_ID" \
+              --repository-name "$repo" --image-ids "imageTag=$tag" \
+              --query 'imageDetails[0].imageDigest' --output text 2>"$error_file"); then
+              rm -f "$error_file"
+              [[ "$output" =~ ^sha256:[a-f0-9]{64}$ ]] || return 1
+              printf '%s' "$output"
+            elif grep -q 'ImageNotFoundException' "$error_file"; then
+              rm -f "$error_file"
+              printf ''
+            else
+              cat "$error_file" >&2
+              rm -f "$error_file"
+              return 1
+            fi
+          }
+
+          for repo in pfs-backend pfs-frontend; do
+            mutability=$(aws ecr describe-repositories --registry-id "$AWS_ACCOUNT_ID" \
+              --repository-names "$repo" --query 'repositories[0].imageTagMutability' --output text)
+            [[ "$mutability" == IMMUTABLE ]] || { echo "::error::$repo must be IMMUTABLE"; exit 1; }
+            digest=$(remote_digest "$repo")
+            if [[ -z "$digest" ]]; then
+              local_revision=$(docker image inspect --format \
+                '{{ index .Config.Labels "org.opencontainers.image.revision" }}' "$repo:ci")
+              [[ "$local_revision" == "$GITHUB_SHA" ]] || { echo '::error::Local image revision mismatch'; exit 1; }
+              docker tag "$repo:ci" "$ECR_REGISTRY/$repo:$tag"
+              if ! docker push "$ECR_REGISTRY/$repo:$tag"; then
+                # Another publisher may have claimed the immutable tag meanwhile.
+                # Accept only a remotely available image with the exact full revision.
+                digest=$(remote_digest "$repo")
+                [[ -n "$digest" ]] || { echo "::error::Push failed for $repo"; exit 1; }
+              fi
+            else
+              echo "Reusing existing immutable tag $repo:$tag"
+            fi
+
+            # Re-read ECR after each push/reuse, then inspect the remote artifact,
+            # not the rebuild (Next.js output need not be reproducible byte-for-byte).
+            digest=$(remote_digest "$repo")
+            [[ -n "$digest" ]] || { echo "::error::Missing remote digest for $repo"; exit 1; }
+            docker pull "$ECR_REGISTRY/$repo@$digest"
+            remote_revision=$(docker image inspect --format \
+              '{{ index .Config.Labels "org.opencontainers.image.revision" }}' "$ECR_REGISTRY/$repo@$digest")
+            [[ "$remote_revision" == "$GITHUB_SHA" ]] || { echo "::error::Immutable tag collision for $repo:$tag (full SHA differs)"; exit 1; }
+            printf '| `%s` | `%s` | `%s` |\n' "$repo" "$tag" "$digest" >> "$rows"
+          done
+
+          {
+            printf '## ECR publication\n\nCommit: `%s`\n\n' "$GITHUB_SHA"
+            printf '| Repository | Tag | Verified ECR digest |\n|---|---|---|\n'
+            cat "$rows"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  security-evidence:
+    name: Collect traceable security evidence
+    if: always()
+    needs: [backend-ci, frontend-ci, security-scan, sast-scan]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout repository at tested commit
+        uses: actions/checkout@v4
+
+      - name: Download backend test evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: auth_service-test-report
+          path: evidence/ci/auth_service
+
+      - name: Download task service test evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: task_service-test-report
+          path: evidence/ci/task_service
+
+      - name: Download frontend validation evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-test-report
+          path: evidence/ci/frontend
+
+      - name: Download secret and dependency scan evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: security-scan-reports
+          path: evidence/security/secrets-and-dependencies
+
+      - name: Download SAST evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: sast-semgrep-report
+          path: evidence/security/sast
+
+      - name: Build evidence index and checksums
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence/metadata evidence/infrastructure
+          cp -R .github evidence/infrastructure/github-workflows
+          if [[ -d infra ]]; then cp -R infra evidence/infrastructure/terraform; fi
+          cat > evidence/metadata/run.json <<EOF
+          {
+            "repository": "${GITHUB_REPOSITORY}",
+            "workflow": "${GITHUB_WORKFLOW}",
+            "run_id": "${GITHUB_RUN_ID}",
+            "run_attempt": "${GITHUB_RUN_ATTEMPT}",
+            "commit": "${GITHUB_SHA}",
+            "ref": "${GITHUB_REF}",
+            "event": "${GITHUB_EVENT_NAME}",
+            "collected_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          cat > evidence/README.md <<'EOF'
+          # Security evidence index
+
+          This archive is tied to the commit and workflow run in
+          `metadata/run.json`. It contains CI test reports, frontend validation,
+          secret/dependency scans, SAST output, and the versioned infrastructure
+          and workflow definitions used for the run.
+
+          `SHA256SUMS` provides integrity checks for every collected file.
+          Missing reports are recorded by the corresponding upstream job status;
+          the evidence collector itself still archives the available controls.
+          EOF
+          find evidence -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > evidence/SHA256SUMS
+
+      - name: Upload centralized evidence archive
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-evidence-${{ github.run_id }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 90

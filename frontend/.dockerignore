@@ -8,3 +8,6 @@
 !app/**
 !public/
 !public/**
+!docker/
+!docker/prepare-runtime.cjs
+!docker/start.cjs
