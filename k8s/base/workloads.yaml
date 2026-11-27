@@ -12,7 +12,7 @@ spec:
       labels:
         app: auth-service
     spec:
-      serviceAccountName: pfs-app
+      serviceAccountName: auth-sa
       automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
@@ -84,7 +84,7 @@ spec:
       labels:
         app: task-service
     spec:
-      serviceAccountName: pfs-app
+      serviceAccountName: task-sa
       automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
@@ -156,7 +156,7 @@ spec:
       labels:
         app: frontend
     spec:
-      serviceAccountName: pfs-app
+      serviceAccountName: frontend-sa
       automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
@@ -218,7 +218,7 @@ spec:
       labels:
         app: mongodb
     spec:
-      serviceAccountName: pfs-app
+      serviceAccountName: mongodb-sa
       automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true

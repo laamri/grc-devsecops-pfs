@@ -51,6 +51,50 @@ jobs:
           trivy-results.sarif
         if-no-files-found: ignore
 
+  
+  iac-scan:
+    name: Terraform IaC Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Scan Terraform with Trivy
+        id: terraform_scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        continue-on-error: true
+        with:
+          scan-type: config
+          scan-ref: ./infra/terraform
+          skip-dirs: "**/.terraform"
+          severity: HIGH,CRITICAL
+          format: json
+          output: terraform-scan.json
+          exit-code: '1'
+
+      - name: Upload Terraform security report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-security-report
+          path: terraform-scan.json
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Enforce Terraform security gate
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.terraform_scan.outcome }}" != "success" ]; then
+            echo "::error::Terraform security scan failed."
+            exit 1
+          fi
+          echo "Terraform security quality gate passed."
+
+
   sast-scan:
     name: SAST Code Analysis (Semgrep)
     runs-on: ubuntu-latest
@@ -170,9 +214,9 @@ jobs:
         if-no-files-found: error
 
   docker-images:
-    name: Build both images after all quality gates
+    name: Build backend and frontend without AWS
     runs-on: ubuntu-latest
-    needs: [backend-ci, frontend-ci, security-scan, sast-scan]
+    needs: [backend-ci, frontend-ci, security-scan, sast-scan,]
     # Default success() semantics skip this job if any required job fails/is skipped.
     permissions:
       contents: read
@@ -188,6 +232,64 @@ jobs:
             -f backend/Dockerfile -t pfs-backend:ci .
           docker build --label "org.opencontainers.image.revision=$GITHUB_SHA" \
             -f frontend/Dockerfile -t pfs-frontend:ci frontend/
+
+      
+      # SCRUM-32: scan the built backend image
+      - name: Scan backend Docker image
+        id: backend_image_scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        continue-on-error: true
+        with:
+          scan-type: image
+          image-ref: pfs-backend:ci
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          format: json
+          output: backend-image-scan.json
+          exit-code: '1'
+
+      # SCRUM-32: scan the built frontend image
+      - name: Scan frontend Docker image
+        id: frontend_image_scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        continue-on-error: true
+        with:
+          scan-type: image
+          image-ref: pfs-frontend:ci
+          scanners: vuln
+          severity: HIGH,CRITICAL
+          format: json
+          output: frontend-image-scan.json
+          exit-code: '1'
+
+      # Preserve reports even when vulnerabilities are found
+      - name: Upload Docker security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-security-reports
+          path: |
+            backend-image-scan.json
+            frontend-image-scan.json
+          if-no-files-found: error
+          retention-days: 90
+
+      # Fail the job when either image scan fails
+      - name: Enforce Docker image security gate
+        if: always()
+        shell: bash
+        env:
+          BACKEND_OUTCOME: ${{ steps.backend_image_scan.outcome }}
+          FRONTEND_OUTCOME: ${{ steps.frontend_image_scan.outcome }}
+        run: |
+          if [[ "$BACKEND_OUTCOME" != "success" ||
+                "$FRONTEND_OUTCOME" != "success" ]]; then
+            echo "::error::Docker image security gate failed."
+            exit 1
+          fi
+
+          echo "Both Docker image security scans passed."
+
 
       - name: Save images for the develop publication job
         if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
@@ -208,7 +310,7 @@ jobs:
   publish-images:
     name: Publish immutable ECR images on develop
     runs-on: ubuntu-latest
-    needs: docker-images
+    needs: [docker-images, iac-scan]
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     permissions:
       contents: read
@@ -339,7 +441,7 @@ jobs:
   security-evidence:
     name: Collect traceable security evidence
     if: always()
-    needs: [backend-ci, frontend-ci, security-scan, sast-scan]
+    needs: [backend-ci, frontend-ci, security-scan, sast-scan, iac-scan , docker-images]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -379,6 +481,26 @@ jobs:
         with:
           name: security-scan-reports
           path: evidence/security/secrets-and-dependencies
+
+      
+      - name: Download Terraform security evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-security-report
+          path: evidence/security/terraform
+
+      
+      - name: Download Docker image security evidence
+        if: always()
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image-security-reports
+          path: evidence/security/docker-images
+
+ 
 
       - name: Download SAST evidence
         if: always()

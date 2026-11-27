@@ -1,0 +1,41 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prod-observers-binding
+  namespace: pfs-prod
+subjects:
+  - kind: Group
+    name: pfs-prod-observers
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: pfs-observer
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prod-cicd-deployer
+  namespace: pfs-prod
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    resourceNames:
+      - frontend
+      - auth-service
+      - task-service
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prod-cicd-binding
+  namespace: pfs-prod
+subjects:
+  - kind: ServiceAccount
+    name: cicd-prod-sa
+    namespace: pfs-prod
+roleRef:
+  kind: Role
+  name: prod-cicd-deployer
+  apiGroup: rbac.authorization.k8s.io

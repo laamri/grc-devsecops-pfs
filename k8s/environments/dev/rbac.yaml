@@ -1,0 +1,55 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dev-developers-binding
+  namespace: pfs-dev
+subjects:
+  - kind: Group
+    name: pfs-developers
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: pfs-developer
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dev-observers-binding
+  namespace: pfs-dev
+subjects:
+  - kind: Group
+    name: pfs-dev-observers
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: pfs-observer
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: dev-cicd-deployer
+  namespace: pfs-dev
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    resourceNames:
+      - frontend
+      - auth-service
+      - task-service
+    verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: dev-cicd-binding
+  namespace: pfs-dev
+subjects:
+  - kind: ServiceAccount
+    name: cicd-dev-sa
+    namespace: pfs-dev
+roleRef:
+  kind: Role
+  name: dev-cicd-deployer
+  apiGroup: rbac.authorization.k8s.io
