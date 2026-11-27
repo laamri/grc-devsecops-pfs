@@ -22,8 +22,8 @@ spec:
           type: RuntimeDefault
       containers:
         - name: auth
-          image: 132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-backend:latest
-          command: ["uvicorn", "auth_service.main:app", "--host", "0.0.0.0", "--port", "8001"]
+          image: 132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-backend:sha-150c07ba35cf
+          command: ["uvicorn", "auth_service.main:app", "--host", "0.0.0.0", "--port", "$(PORT)"]
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -39,11 +39,10 @@ spec:
           ports:
             - name: http
               containerPort: 8001
+          envFrom:
+            - configMapRef:
+                name: auth-config
           env:
-            - name: PORT
-              value: "8001"
-            - name: CORS_ORIGINS
-              value: "https://pfs.example.com"
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -94,8 +93,8 @@ spec:
           type: RuntimeDefault
       containers:
         - name: task
-          image: 132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-backend:latest
-          command: ["uvicorn", "task_service.main:app", "--host", "0.0.0.0", "--port", "8002"]
+          image: 132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-backend:sha-150c07ba35cf
+          command: ["uvicorn", "task_service.main:app", "--host", "0.0.0.0", "--port", "$(PORT)"]
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -111,11 +110,10 @@ spec:
           ports:
             - name: http
               containerPort: 8002
+          envFrom:
+            - configMapRef:
+                name: task-config
           env:
-            - name: PORT
-              value: "8002"
-            - name: CORS_ORIGINS
-              value: "https://pfs.example.com"
             - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
@@ -162,11 +160,40 @@ spec:
         runAsNonRoot: true
         runAsUser: 10001
         runAsGroup: 10001
+        fsGroup: 10001
         seccompProfile:
           type: RuntimeDefault
+      initContainers:
+        - name: prepare-next-runtime
+          image: 132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-frontend:sha-150c07ba35cf
+          command: ["sh", "-c", "cp -R /app/.next/. /runtime/"]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: next-runtime
+              mountPath: /runtime
+      volumes:
+        - name: next-runtime
+          emptyDir: {}
       containers:
         - name: frontend
-          image: 132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-frontend:latest
+          image: 132415609490.dkr.ecr.eu-north-1.amazonaws.com/pfs-frontend:sha-150c07ba35cf
+          envFrom:
+            - configMapRef:
+                name: frontend-config
+          volumeMounts:
+            - name: next-runtime
+              mountPath: /app/.next
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -229,7 +256,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: mongodb
-          image: mongo:7.0
+          image: mongo:8.0.38@sha256:d97fea17ccb8d004cd137be8dab54d70d0df11be69c9f422aefe4484c8414ab7
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -245,12 +272,31 @@ spec:
           ports:
             - name: mongo
               containerPort: 27017
+          readinessProbe:
+            exec:
+              command: ["mongosh", "--quiet", "--eval", "quit(db.adminCommand({ping:1}).ok ? 0 : 1)"]
+            periodSeconds: 5
+            timeoutSeconds: 3
+            initialDelaySeconds: 10
+          livenessProbe:
+            exec:
+              command: ["mongosh", "--quiet", "--eval", "quit(db.adminCommand({ping:1}).ok ? 0 : 1)"]
+            periodSeconds: 10
+            timeoutSeconds: 3
+            initialDelaySeconds: 30
+          env:
+            - name: HOME
+              value: /tmp
           volumeMounts:
+            - name: configdb
+              mountPath: /data/configdb
             - name: data
               mountPath: /data/db
             - name: tmp
               mountPath: /tmp
       volumes:
+        - name: configdb
+          emptyDir: {}
         - name: tmp
           emptyDir: {}
   volumeClaimTemplates:
