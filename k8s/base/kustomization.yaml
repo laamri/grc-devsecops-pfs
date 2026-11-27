@@ -8,6 +8,7 @@ resources:
   - rbac.yaml
   - secret-store.yaml
   - external-secret.yaml
+  - configmaps.yaml
   - workloads.yaml
   - issuer.yaml
   - certificate.yaml
